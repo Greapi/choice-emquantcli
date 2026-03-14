@@ -1,22 +1,56 @@
 # emq-cli
 
-A production-ready Python CLI starter built with `uv`, `Typer`, `ruff`, `pytest`, and `mypy`.
+`emq` is a domain-oriented command line tool for EmQuantAPI with vendored runtime libraries.
 
 ## Requirements
 
 - Python 3.11+
 - [uv](https://docs.astral.sh/uv/)
 
-## 5-minute quick start
+## Quick Start
 
 ```bash
 uv sync --dev
 uv run emq --help
-uv run emq hello --name Alice
-uv run python -m emq hello --name Bob
 ```
 
-## Development commands
+Login once (credentials from flags or env):
+
+```bash
+export EMQ_USER='your_user'
+export EMQ_PASS='your_pass'
+uv run emq auth login
+```
+
+Sample market query:
+
+```bash
+uv run emq market series 000001.SZ CLOSE --start 2025-01-01 --end 2025-12-31 --output table
+```
+
+## Command Domains
+
+- `auth`: `login`, `logout`, `status`
+- `market`: `snapshot`, `series`
+- `portfolio`: `create`, `list`, `order`
+- `quota`: `usage`
+- `raw`: `css`, `csd`, `pquery`, `porder`
+
+## Output
+
+Every command uses a unified envelope and supports:
+
+- `--output json` (default)
+- `--output table` (ASCII)
+- `--output csv`
+
+## Credential Persistence
+
+- `auth login` saves credentials to `~/.emq/state.json` (plain text, initial version).
+- Business commands auto-login from saved state or environment variables.
+- `auth logout` clears local state and calls SDK logout.
+
+## Development
 
 ```bash
 uv run ruff check .
@@ -24,25 +58,7 @@ uv run mypy src
 uv run pytest
 ```
 
-## Project layout
+## Notes
 
-```text
-.
-├── pyproject.toml
-├── src/emq
-│   ├── __init__.py
-│   ├── __main__.py
-│   └── cli.py
-├── tests/test_cli.py
-└── .github/workflows/ci.yml
-```
-
-## Common issues
-
-- `uv: command not found`: install `uv` and restart your shell session.
-- `emq: command not found`: run via `uv run emq ...` or ensure the virtual environment is active.
-- Import errors in editors: configure your IDE to use the `.venv` created by `uv`.
-
-## License
-
-MIT
+- The vendored SDK lives in `src/emq/vendor/emquantapi/python3`.
+- Root `EMQuantAPI_Python` should not be kept after migration.

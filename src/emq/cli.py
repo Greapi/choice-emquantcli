@@ -1,24 +1,43 @@
+from __future__ import annotations
+
 import typer
+
+from emq.commands.auth import app as auth_app
+from emq.commands.market import app as market_app
+from emq.commands.portfolio import app as portfolio_app
+from emq.commands.quota import app as quota_app
+from emq.commands.raw import app as raw_app
+from emq.core.logging import setup_logging
 
 app = typer.Typer(
     name="emq",
-    help="A sample production-ready CLI built with Typer.",
+    help="EMQ command line interface.",
     add_completion=False,
 )
 
+app.add_typer(auth_app, name="auth")
+app.add_typer(market_app, name="market")
+app.add_typer(portfolio_app, name="portfolio")
+app.add_typer(quota_app, name="quota")
+app.add_typer(raw_app, name="raw")
+
 
 @app.callback()
-def callback() -> None:
-    """EMQ CLI root command group."""
-
-
-@app.command()
-def hello(
-    name: str = typer.Option(..., "--name", help="Name to greet."),
-    times: int = typer.Option(1, "--times", help="Number of greetings.", min=1),
+def callback(
+    ctx: typer.Context,
+    output: str = typer.Option("json", "--output", help="Output format: json|table|csv."),
+    log_level: str = typer.Option("INFO", "--log-level", help="Log level."),
+    log_file: str | None = typer.Option(None, "--log-file", help="Optional log file path."),
+    no_auto_login: bool = typer.Option(False, "--no-auto-login", help="Disable automatic login."),
 ) -> None:
-    for _ in range(times):
-        typer.echo(f"Hello, {name}")
+    setup_logging(log_level, log_file)
+    fmt = output.lower().strip()
+    if fmt not in {"json", "table", "csv"}:
+        raise typer.BadParameter("--output must be one of: json, table, csv")
+
+    ctx.ensure_object(dict)
+    ctx.obj["output"] = fmt
+    ctx.obj["no_auto_login"] = no_auto_login
 
 
 def main() -> None:

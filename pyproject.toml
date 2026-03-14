@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "emq-cli"
 version = "0.1.0"
-description = "A production-ready EMQ CLI starter built with Typer."
+description = "EMQ CLI with vendored EmQuantAPI integration."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -28,6 +28,7 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py311"
+extend-exclude = ["EMQuantAPI_Python", "src/emq/vendor"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
@@ -41,6 +42,7 @@ disallow_untyped_defs = true
 no_implicit_optional = true
 check_untyped_defs = true
 strict_equality = true
+exclude = "(^src/emq/vendor/|^EMQuantAPI_Python/)"
 
 [tool.pytest.ini_options]
 addopts = "-ra"
@@ -48,3 +50,19 @@ testpaths = ["tests"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/emq"]
+[tool.hatch.build]
+include = [
+  "src/emq/**",
+  "README.md",
+  "ARCHITECHTURE.md",
+  "docs/**",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/emq",
+  "tests",
+  "README.md",
+  "ARCHITECHTURE.md",
+  "docs",
+]

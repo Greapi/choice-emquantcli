@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import typer
 
+from emq.commands._common import normalize_output
 from emq.commands.auth import app as auth_app
 from emq.commands.market import app as market_app
 from emq.commands.portfolio import app as portfolio_app
@@ -31,9 +32,7 @@ def callback(
     no_auto_login: bool = typer.Option(False, "--no-auto-login", help="Disable automatic login."),
 ) -> None:
     setup_logging(log_level, log_file)
-    fmt = output.lower().strip()
-    if fmt not in {"json", "table", "csv"}:
-        raise typer.BadParameter("--output must be one of: json, table, csv")
+    fmt = normalize_output(output)
 
     ctx.ensure_object(dict)
     ctx.obj["output"] = fmt

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typer
 
-from emq.commands._common import execute_sdk_command
+from emq.commands._common import apply_output_override, execute_sdk_command
 from emq.core.session import login, logout, status
 
 app = typer.Typer(help="Authentication commands.")
@@ -17,7 +17,11 @@ def login_cmd(
         True, "--force-login/--no-force-login", help="Set ForceLogin."
     ),
     save: bool = typer.Option(True, "--save/--no-save", help="Save credentials to local state."),
+    output: str | None = typer.Option(
+        None, "--output", help="Output format override: json|table|csv."
+    ),
 ) -> None:
+    apply_output_override(ctx, output)
     execute_sdk_command(
         ctx,
         command="auth.login",
@@ -26,7 +30,13 @@ def login_cmd(
 
 
 @app.command("logout")
-def logout_cmd(ctx: typer.Context) -> None:
+def logout_cmd(
+    ctx: typer.Context,
+    output: str | None = typer.Option(
+        None, "--output", help="Output format override: json|table|csv."
+    ),
+) -> None:
+    apply_output_override(ctx, output)
     execute_sdk_command(ctx, command="auth.logout", fn=logout)
 
 
@@ -34,7 +44,11 @@ def logout_cmd(ctx: typer.Context) -> None:
 def status_cmd(
     ctx: typer.Context,
     check: bool = typer.Option(False, "--check", help="Probe remote API status."),
+    output: str | None = typer.Option(
+        None, "--output", help="Output format override: json|table|csv."
+    ),
 ) -> None:
+    apply_output_override(ctx, output)
     no_auto_login = bool((ctx.obj or {}).get("no_auto_login", False))
     execute_sdk_command(
         ctx,

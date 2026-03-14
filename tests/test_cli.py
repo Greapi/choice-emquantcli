@@ -111,6 +111,33 @@ def test_market_series_table_output(monkeypatch) -> None:
     assert "CLOSE" in result.output
 
 
+def test_market_series_trailing_output_table(monkeypatch) -> None:
+    from emq.commands import market
+
+    client = FakeClient()
+    monkeypatch.setattr(market, "ensure_login", lambda no_auto_login=False: {"ok": True})
+    monkeypatch.setattr(market, "get_emquant_client", lambda: client)
+
+    result = runner.invoke(
+        app,
+        [
+            "market",
+            "series",
+            "000001.SZ",
+            "CLOSE",
+            "--start",
+            "2025-01-01",
+            "--end",
+            "2025-01-02",
+            "--output",
+            "table",
+        ],
+    )
+    assert result.exit_code == 0
+    assert "000001.SZ" in result.output
+    assert "CLOSE" in result.output
+
+
 def test_market_series_csv_output(monkeypatch) -> None:
     from emq.commands import market
 
@@ -135,6 +162,61 @@ def test_market_series_csv_output(monkeypatch) -> None:
     )
     assert result.exit_code == 0
     assert "code,indicator,date,value" in result.output
+
+
+def test_raw_pquery_trailing_output_csv(monkeypatch) -> None:
+    from emq.commands import raw
+
+    client = FakeClient()
+    monkeypatch.setattr(raw, "ensure_login", lambda no_auto_login=False: {"ok": True})
+    monkeypatch.setattr(raw, "get_emquant_client", lambda: client)
+
+    result = runner.invoke(
+        app,
+        ["raw", "pquery", "--output", "csv"],
+    )
+    assert result.exit_code == 0
+    assert "code,indicator,date,value" in result.output
+
+
+def test_trailing_output_overrides_global_output(monkeypatch) -> None:
+    from emq.commands import market
+
+    client = FakeClient()
+    monkeypatch.setattr(market, "ensure_login", lambda no_auto_login=False: {"ok": True})
+    monkeypatch.setattr(market, "get_emquant_client", lambda: client)
+
+    result = runner.invoke(
+        app,
+        [
+            "--output",
+            "json",
+            "market",
+            "series",
+            "000001.SZ",
+            "CLOSE",
+            "--start",
+            "2025-01-01",
+            "--end",
+            "2025-01-02",
+            "--output",
+            "table",
+        ],
+    )
+    assert result.exit_code == 0
+    assert "|" in result.output
+    assert '"success"' not in result.output
+
+
+def test_trailing_output_invalid_value(monkeypatch) -> None:
+    from emq.commands import raw
+
+    monkeypatch.setattr(raw, "ensure_login", lambda no_auto_login=False: {"ok": True})
+    monkeypatch.setattr(raw, "get_emquant_client", lambda: FakeClient())
+
+    result = runner.invoke(app, ["raw", "pquery", "--output", "invalid"])
+    assert result.exit_code == 2
+    assert "--output must be one of: json, table, csv" in result.output
 
 
 def test_raw_css_options_passthrough(monkeypatch) -> None:

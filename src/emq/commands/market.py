@@ -4,7 +4,7 @@ from typing import Any
 
 import typer
 
-from emq.commands._common import execute_sdk_command, get_no_auto_login
+from emq.commands._common import apply_output_override, execute_sdk_command, get_no_auto_login
 from emq.core.emquant_loader import get_emquant_client
 from emq.core.session import ensure_login
 
@@ -17,7 +17,11 @@ def snapshot(
     codes: str = typer.Argument(..., help="Codes, comma-separated."),
     indicators: str = typer.Argument(..., help="Indicators, comma-separated."),
     options: str = typer.Option("", "--options", help="Raw EmQuant options string."),
+    output: str | None = typer.Option(
+        None, "--output", help="Output format override: json|table|csv."
+    ),
 ) -> None:
+    apply_output_override(ctx, output)
     execute_sdk_command(
         ctx,
         command="market.snapshot",
@@ -33,7 +37,11 @@ def series(
     start: str = typer.Option(..., "--start", help="Start date YYYY-MM-DD."),
     end: str = typer.Option(..., "--end", help="End date YYYY-MM-DD."),
     options: str = typer.Option("", "--options", help="Raw EmQuant options string."),
+    output: str | None = typer.Option(
+        None, "--output", help="Output format override: json|table|csv."
+    ),
 ) -> None:
+    apply_output_override(ctx, output)
     execute_sdk_command(
         ctx,
         command="market.series",

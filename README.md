@@ -44,6 +44,9 @@ Every command uses a unified envelope and supports:
 - `--output table` (ASCII)
 - `--output csv`
 
+`--output` can be placed either before the domain command (global) or at the end of leaf commands (override).  
+If both are provided, the leaf command `--output` takes precedence.
+
 ## Credential Persistence
 
 - `auth login` saves credentials to `~/.emq/state.json` (plain text, initial version).

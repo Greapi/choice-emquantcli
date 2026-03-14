@@ -6,7 +6,7 @@ from typing import Any
 
 import typer
 
-from emq.commands._common import execute_sdk_command, get_no_auto_login
+from emq.commands._common import apply_output_override, execute_sdk_command, get_no_auto_login
 from emq.core.emquant_loader import get_emquant_client
 from emq.core.errors import EmqCliError
 from emq.core.session import ensure_login
@@ -20,7 +20,11 @@ def css(
     codes: str = typer.Argument(...),
     indicators: str = typer.Argument(...),
     options: str = typer.Option("", "--options"),
+    output: str | None = typer.Option(
+        None, "--output", help="Output format override: json|table|csv."
+    ),
 ) -> None:
+    apply_output_override(ctx, output)
     execute_sdk_command(
         ctx,
         command="raw.css",
@@ -36,7 +40,11 @@ def csd(
     start: str = typer.Option(..., "--start"),
     end: str = typer.Option(..., "--end"),
     options: str = typer.Option("", "--options"),
+    output: str | None = typer.Option(
+        None, "--output", help="Output format override: json|table|csv."
+    ),
 ) -> None:
+    apply_output_override(ctx, output)
     execute_sdk_command(
         ctx,
         command="raw.csd",
@@ -48,7 +56,11 @@ def csd(
 def pquery(
     ctx: typer.Context,
     options: str = typer.Option("", "--options"),
+    output: str | None = typer.Option(
+        None, "--output", help="Output format override: json|table|csv."
+    ),
 ) -> None:
+    apply_output_override(ctx, output)
     execute_sdk_command(
         ctx,
         command="raw.pquery",
@@ -69,7 +81,11 @@ def porder(
     ),
     remark: str = typer.Option("", "--remark"),
     options: str = typer.Option("", "--options"),
+    output: str | None = typer.Option(
+        None, "--output", help="Output format override: json|table|csv."
+    ),
 ) -> None:
+    apply_output_override(ctx, output)
     execute_sdk_command(
         ctx,
         command="raw.porder",

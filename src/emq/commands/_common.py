@@ -11,6 +11,20 @@ from emq.core.output import build_envelope, emit
 from emq.types import ErrorInfo
 
 
+def normalize_output(value: str) -> str:
+    fmt = value.lower().strip()
+    if fmt not in {"json", "table", "csv"}:
+        raise typer.BadParameter("--output must be one of: json, table, csv")
+    return fmt
+
+
+def apply_output_override(ctx: typer.Context, output_override: str | None) -> None:
+    if output_override is None:
+        return
+    ctx.ensure_object(dict)
+    ctx.obj["output"] = normalize_output(output_override)
+
+
 def get_global_output(ctx: typer.Context) -> str:
     obj = ctx.obj or {}
     return str(obj.get("output", "json"))

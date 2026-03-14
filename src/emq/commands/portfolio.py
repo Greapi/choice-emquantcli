@@ -6,7 +6,7 @@ from typing import Any
 
 import typer
 
-from emq.commands._common import execute_sdk_command, get_no_auto_login
+from emq.commands._common import apply_output_override, execute_sdk_command, get_no_auto_login
 from emq.core.emquant_loader import get_emquant_client
 from emq.core.errors import EmqCliError
 from emq.core.session import ensure_login
@@ -22,7 +22,11 @@ def create(
     initial_fund: float = typer.Option(..., "--initial-fund", help="Initial fund."),
     remark: str = typer.Option("", "--remark", help="Remark."),
     options: str = typer.Option("", "--options", help="Raw EmQuant options string."),
+    output: str | None = typer.Option(
+        None, "--output", help="Output format override: json|table|csv."
+    ),
 ) -> None:
+    apply_output_override(ctx, output)
     execute_sdk_command(
         ctx,
         command="portfolio.create",
@@ -34,7 +38,11 @@ def create(
 def list_portfolio(
     ctx: typer.Context,
     options: str = typer.Option("", "--options", help="Raw EmQuant options string."),
+    output: str | None = typer.Option(
+        None, "--output", help="Output format override: json|table|csv."
+    ),
 ) -> None:
+    apply_output_override(ctx, output)
     execute_sdk_command(
         ctx,
         command="portfolio.list",
@@ -55,7 +63,11 @@ def order(
     ),
     remark: str = typer.Option("", "--remark", help="Remark."),
     options: str = typer.Option("", "--options", help="Raw EmQuant options string."),
+    output: str | None = typer.Option(
+        None, "--output", help="Output format override: json|table|csv."
+    ),
 ) -> None:
+    apply_output_override(ctx, output)
     execute_sdk_command(
         ctx,
         command="portfolio.order",

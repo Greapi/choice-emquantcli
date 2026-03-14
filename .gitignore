@@ -23,3 +23,6 @@ coverage.xml
 .DS_Store
 .idea/
 .vscode/
+
+# EmQuant API local login artifact
+src/emq/vendor/emquantapi/python3/libs/mac/logininfo.log

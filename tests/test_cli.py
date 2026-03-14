@@ -1,6 +1,6 @@
 from typer.testing import CliRunner
 
-from choice_cli.main import app
+from emq.cli import app
 
 runner = CliRunner()
 

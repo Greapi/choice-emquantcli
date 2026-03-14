@@ -1,7 +1,7 @@
 import typer
 
 app = typer.Typer(
-    name="choice",
+    name="emq",
     help="A sample production-ready CLI built with Typer.",
     add_completion=False,
 )
@@ -9,7 +9,7 @@ app = typer.Typer(
 
 @app.callback()
 def callback() -> None:
-    """Choice CLI root command group."""
+    """EMQ CLI root command group."""
 
 
 @app.command()

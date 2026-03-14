@@ -3,19 +3,19 @@ requires = ["hatchling>=1.24.0"]
 build-backend = "hatchling.build"
 
 [project]
-name = "choice-cli"
+name = "emq-cli"
 version = "0.1.0"
-description = "A production-ready Python CLI starter built with Typer."
+description = "A production-ready EMQ CLI starter built with Typer."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-authors = [{ name = "choice-cli contributors" }]
+authors = [{ name = "emq-cli contributors" }]
 dependencies = [
   "typer>=0.16.0,<1.0.0",
 ]
 
 [project.scripts]
-choice = "choice_cli.main:main"
+emq = "emq.cli:main"
 
 [dependency-groups]
 dev = [
@@ -45,3 +45,6 @@ strict_equality = true
 [tool.pytest.ini_options]
 addopts = "-ra"
 testpaths = ["tests"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/emq"]

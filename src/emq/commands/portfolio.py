@@ -153,8 +153,9 @@ def _qorder(
     ensure_login(no_auto_login=no_auto_login)
     c = get_emquant_client()
 
-    # Build order dict following SDK spec
-    # Note: SDK expects all values to be lists
+    # Build order dict for SDK porder function
+    # Ref: https://quantapi.eastmoney.com/Upload/EMQuantAPI_Python.html
+    # SDK expects lists for batch orders, even for single order
     order_dict: dict[str, Any] = {
         "code": [stock],
         "volume": [volume],

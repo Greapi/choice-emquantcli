@@ -216,7 +216,7 @@ def test_trailing_output_invalid_value(monkeypatch) -> None:
 
     result = runner.invoke(app, ["raw", "pquery", "--output", "invalid"])
     assert result.exit_code == 2
-    assert "--output must be one of: json, table, csv" in result.output
+    assert "Invalid value: --output must be one of: json, table, csv" in result.output
 
 
 def test_raw_css_options_passthrough(monkeypatch) -> None:
@@ -302,12 +302,12 @@ def test_portfolio_qorder_builds_order_dict(monkeypatch) -> None:
     assert result.exit_code == 0
     assert client.calls[-1][0] == "porder"
     assert client.calls[-1][1] == "P1"
-    # Verify order dict structure
+    # Verify order dict structure (SDK expects lists for batch orders)
     order_dict = client.calls[-1][2]
-    assert order_dict["code"] == "300059.SZ"
-    assert order_dict["volume"] == 1000.0
-    assert order_dict["price"] == 10.5
-    assert order_dict["date"] == "20250115"  # Normalized format
+    assert order_dict["code"] == ["300059.SZ"]
+    assert order_dict["volume"] == [1000.0]
+    assert order_dict["price"] == [10.5]
+    assert order_dict["date"] == ["20250115"]  # Normalized format
 
 
 def test_portfolio_qorder_with_optional_params(monkeypatch) -> None:
@@ -342,10 +342,10 @@ def test_portfolio_qorder_with_optional_params(monkeypatch) -> None:
     )
     assert result.exit_code == 0
     order_dict = client.calls[-1][2]
-    assert order_dict["code"] == "000001.SZ"
-    assert order_dict["volume"] == -500.0
-    assert order_dict["time"] == "143000"  # Normalized format
-    assert order_dict["optype"] == 2
+    assert order_dict["code"] == ["000001.SZ"]
+    assert order_dict["volume"] == [-500.0]
+    assert order_dict["time"] == ["143000"]  # Normalized format
+    assert order_dict["optype"] == [2]
 
 
 def test_portfolio_qorder_missing_required_params() -> None:

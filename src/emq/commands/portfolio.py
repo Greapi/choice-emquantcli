@@ -154,19 +154,20 @@ def _qorder(
     c = get_emquant_client()
 
     # Build order dict following SDK spec
+    # Note: SDK expects all values to be lists
     order_dict: dict[str, Any] = {
-        "code": stock,
-        "volume": volume,
-        "price": price,
-        "date": date.replace("-", "").replace("/", ""),  # Normalize to YYYYMMDD
+        "code": [stock],
+        "volume": [volume],
+        "price": [price],
+        "date": [date.replace("-", "").replace("/", "")],  # Normalize to YYYYMMDD
     }
 
     if time is not None:
         # Normalize time format (HH:MM:SS -> HHMMSS)
-        order_dict["time"] = time.replace(":", "")
+        order_dict["time"] = [time.replace(":", "")]
 
     if type > 0:
-        order_dict["optype"] = type
+        order_dict["optype"] = [type]
 
     return c.porder(code, order_dict, remark, options)
 

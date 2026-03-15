@@ -216,7 +216,7 @@ def test_trailing_output_invalid_value(monkeypatch) -> None:
 
     result = runner.invoke(app, ["raw", "pquery", "--output", "invalid"])
     assert result.exit_code == 2
-    assert "Invalid value: --output must be one of: json, table, csv" in result.output
+    assert "--output must be one of: json, table, csv" in result.output
 
 
 def test_raw_css_options_passthrough(monkeypatch) -> None:

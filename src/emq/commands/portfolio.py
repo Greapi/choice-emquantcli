@@ -108,6 +108,69 @@ def _list(options: str, no_auto_login: bool) -> Any:
     return c.pquery(options)
 
 
+@app.command("qorder")
+def qorder(
+    ctx: typer.Context,
+    code: str = typer.Option(..., "--code", help="Portfolio code."),
+    stock: str = typer.Option(..., "--stock", help="Stock code, e.g., 300059.SZ"),
+    volume: float = typer.Option(
+        ..., "--volume", help="Trading volume (positive=buy, negative=sell)."
+    ),
+    price: float = typer.Option(..., "--price", help="Trading price."),
+    date: str = typer.Option(..., "--date", help="Trading date (YYYY-MM-DD)."),
+    time: str | None = typer.Option(None, "--time", help="Trading time (HHMMSS or HH:MM:SS)."),
+    type: int = typer.Option(
+        0, "--type", help="Operation type: 1=buy, 2=sell, 3=subscribe, 4=redeem."
+    ),
+    remark: str = typer.Option("", "--remark", help="Remark."),
+    options: str = typer.Option("", "--options", help="Raw EmQuant options string."),
+    output: str | None = typer.Option(
+        None, "--output", help="Output format override: json|table|csv."
+    ),
+) -> None:
+    apply_output_override(ctx, output)
+    execute_sdk_command(
+        ctx,
+        command="portfolio.qorder",
+        fn=lambda: _qorder(
+            code, stock, volume, price, date, time, type, remark, options, get_no_auto_login(ctx)
+        ),
+    )
+
+
+def _qorder(
+    code: str,
+    stock: str,
+    volume: float,
+    price: float,
+    date: str,
+    time: str | None,
+    type: int,
+    remark: str,
+    options: str,
+    no_auto_login: bool,
+) -> Any:
+    ensure_login(no_auto_login=no_auto_login)
+    c = get_emquant_client()
+
+    # Build order dict following SDK spec
+    order_dict: dict[str, Any] = {
+        "code": stock,
+        "volume": volume,
+        "price": price,
+        "date": date.replace("-", "").replace("/", ""),  # Normalize to YYYYMMDD
+    }
+
+    if time is not None:
+        # Normalize time format (HH:MM:SS -> HHMMSS)
+        order_dict["time"] = time.replace(":", "")
+
+    if type > 0:
+        order_dict["optype"] = type
+
+    return c.porder(code, order_dict, remark, options)
+
+
 def _order(code: str, orders_file: Path, remark: str, options: str, no_auto_login: bool) -> Any:
     ensure_login(no_auto_login=no_auto_login)
     c = get_emquant_client()

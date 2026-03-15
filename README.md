@@ -28,11 +28,17 @@ Sample market query:
 uv run emq market series 000001.SZ CLOSE --start 2025-01-01 --end 2025-12-31 --output table
 ```
 
+Quick portfolio order:
+
+```bash
+uv run emq portfolio qorder --code MYPORT --stock 300059.SZ --volume 1000 --price 10.5 --date 2025-01-15
+```
+
 ## Command Domains
 
 - `auth`: `login`, `logout`, `status`
 - `market`: `snapshot`, `series`
-- `portfolio`: `create`, `list`, `order`
+- `portfolio`: `create`, `list`, `order`, `qorder`
 - `quota`: `usage`
 - `raw`: `css`, `csd`, `pquery`, `porder`
 

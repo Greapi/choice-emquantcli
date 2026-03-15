@@ -275,6 +275,86 @@ def test_portfolio_order_invalid_json(monkeypatch, tmp_path: Path) -> None:
     assert "invalid JSON" in result.output
 
 
+def test_portfolio_qorder_builds_order_dict(monkeypatch) -> None:
+    from emq.commands import portfolio
+
+    client = FakeClient()
+    monkeypatch.setattr(portfolio, "ensure_login", lambda no_auto_login=False: {"ok": True})
+    monkeypatch.setattr(portfolio, "get_emquant_client", lambda: client)
+
+    result = runner.invoke(
+        app,
+        [
+            "portfolio",
+            "qorder",
+            "--code",
+            "P1",
+            "--stock",
+            "300059.SZ",
+            "--volume",
+            "1000",
+            "--price",
+            "10.5",
+            "--date",
+            "2025-01-15",
+        ],
+    )
+    assert result.exit_code == 0
+    assert client.calls[-1][0] == "porder"
+    assert client.calls[-1][1] == "P1"
+    # Verify order dict structure
+    order_dict = client.calls[-1][2]
+    assert order_dict["code"] == "300059.SZ"
+    assert order_dict["volume"] == 1000.0
+    assert order_dict["price"] == 10.5
+    assert order_dict["date"] == "20250115"  # Normalized format
+
+
+def test_portfolio_qorder_with_optional_params(monkeypatch) -> None:
+    from emq.commands import portfolio
+
+    client = FakeClient()
+    monkeypatch.setattr(portfolio, "ensure_login", lambda no_auto_login=False: {"ok": True})
+    monkeypatch.setattr(portfolio, "get_emquant_client", lambda: client)
+
+    result = runner.invoke(
+        app,
+        [
+            "portfolio",
+            "qorder",
+            "--code",
+            "P1",
+            "--stock",
+            "000001.SZ",
+            "--volume",
+            "-500",
+            "--price",
+            "15.0",
+            "--date",
+            "2025-01-20",
+            "--time",
+            "14:30:00",
+            "--type",
+            "2",
+            "--remark",
+            "Sell order",
+        ],
+    )
+    assert result.exit_code == 0
+    order_dict = client.calls[-1][2]
+    assert order_dict["code"] == "000001.SZ"
+    assert order_dict["volume"] == -500.0
+    assert order_dict["time"] == "143000"  # Normalized format
+    assert order_dict["optype"] == 2
+
+
+def test_portfolio_qorder_missing_required_params() -> None:
+    # Test missing required parameters
+    result = runner.invoke(app, ["portfolio", "qorder", "--code", "P1"])
+    assert result.exit_code != 0
+    assert "--stock" in result.output or "Missing option" in result.output
+
+
 def test_sdk_error_mapped_to_nonzero_exit(monkeypatch) -> None:
     from emq.commands import raw
 

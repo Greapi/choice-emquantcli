@@ -25,6 +25,7 @@
 - `portfolio create --code --name --initial-fund [--remark] [--options]`
 - `portfolio list [--options]`
 - `portfolio order --code <combinCode> --orders-file <json> [--remark] [--options]`
+- `portfolio qorder --code <combinCode> --stock <code> --volume <n> --price <p> --date <date> [--time <time>] [--type <type>] [--remark] [--options]`
 
 ### quota
 
@@ -85,3 +86,4 @@ Envelope schema:
 - Login precedence and auto-login semantics.
 - Raw option passthrough and order file validation.
 - SDK error mapping.
+- SDK mocking via `FakeClient`/`FakeEmqData` with call recording for verification.

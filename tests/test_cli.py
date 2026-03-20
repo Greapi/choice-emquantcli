@@ -313,7 +313,7 @@ def test_portfolio_create_rejects_decimal_initial_fund() -> None:
         ],
     )
     assert result.exit_code == 2
-    assert "--initial-fund" in result.output
+    assert "not a valid integer" in result.output
 
 
 def test_portfolio_order_invalid_json(monkeypatch, tmp_path: Path) -> None:

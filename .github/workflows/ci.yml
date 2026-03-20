@@ -29,6 +29,8 @@ jobs:
             RANGE="${PR_BASE_SHA}..${PR_HEAD_SHA}"
           elif [ "$EVENT_NAME" = "push" ] && [ "${PUSH_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
             RANGE="${PUSH_BEFORE_SHA}..${PUSH_HEAD_SHA}"
+          elif [ "$EVENT_NAME" = "push" ] && git rev-parse --verify "${PUSH_HEAD_SHA}^" >/dev/null 2>&1; then
+            RANGE="${PUSH_HEAD_SHA}^..${PUSH_HEAD_SHA}"
           else
             RANGE="${PUSH_HEAD_SHA}"
           fi

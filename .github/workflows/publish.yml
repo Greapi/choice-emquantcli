@@ -51,11 +51,11 @@ jobs:
         run: |
           set -eux
           if [ "${{ runner.os }}" = "Linux" ]; then
-            python -m wheel tags --platform-tag linux_x86_64 --remove dist/*.whl
+            uv run --with wheel python -m wheel tags --platform-tag linux_x86_64 --remove dist/*.whl
           elif [ "${{ runner.os }}" = "macOS" ]; then
-            python -m wheel tags --platform-tag macosx_11_0_universal2 --remove dist/*.whl
+            uv run --with wheel python -m wheel tags --platform-tag macosx_11_0_universal2 --remove dist/*.whl
           elif [ "${{ runner.os }}" = "Windows" ]; then
-            python -m wheel tags --platform-tag win_amd64 --remove dist/*.whl
+            uv run --with wheel python -m wheel tags --platform-tag win_amd64 --remove dist/*.whl
           else
             echo "Unsupported runner OS: ${{ runner.os }}"
             exit 1

@@ -6,7 +6,38 @@ on:
   workflow_call:
 
 jobs:
+  commit_convention:
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate commit messages (Chinese subject)
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+          PUSH_HEAD_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            RANGE="${PR_BASE_SHA}..${PR_HEAD_SHA}"
+          elif [ "$EVENT_NAME" = "push" ] && [ "${PUSH_BEFORE_SHA}" != "0000000000000000000000000000000000000000" ]; then
+            RANGE="${PUSH_BEFORE_SHA}..${PUSH_HEAD_SHA}"
+          else
+            RANGE="${PUSH_HEAD_SHA}"
+          fi
+
+          python scripts/validate_commits.py --range "$RANGE"
+
   test:
+    needs: commit_convention
+    if: ${{ always() && (needs.commit_convention.result == 'success' || needs.commit_convention.result == 'skipped') }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

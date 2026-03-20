@@ -79,3 +79,4 @@ uv run pytest
 
 - The vendored SDK lives in `src/emq/vendor/emquantapi/python3`.
 - Root `EMQuantAPI_Python` should not be kept after migration.
+- Commit and release governance: `docs/commit-and-release.md`.

@@ -6,7 +6,24 @@ on:
       - 'v*.*.*'
 
 jobs:
+  verify_release_tag:
+    name: Verify release tag and version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Validate release tag
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          python scripts/validate_release_tag.py --tag "$TAG_NAME"
+
   test:
+    needs: verify_release_tag
     uses: ./.github/workflows/ci.yml
 
   build:

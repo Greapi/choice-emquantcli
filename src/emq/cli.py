@@ -8,6 +8,7 @@ from emq.commands.market import app as market_app
 from emq.commands.portfolio import app as portfolio_app
 from emq.commands.quota import app as quota_app
 from emq.commands.raw import app as raw_app
+from emq.commands.skill import app as skill_app
 from emq.core.logging import setup_logging
 
 app = typer.Typer(
@@ -21,6 +22,7 @@ app.add_typer(market_app, name="market")
 app.add_typer(portfolio_app, name="portfolio")
 app.add_typer(quota_app, name="quota")
 app.add_typer(raw_app, name="raw")
+app.add_typer(skill_app, name="skill")
 
 
 @app.callback()

@@ -82,6 +82,15 @@ def test_help_shows_domains() -> None:
     assert "portfolio" in result.output
     assert "quota" in result.output
     assert "raw" in result.output
+    assert "skill" in result.output
+
+
+def test_skill_path_returns_packaged_skill_path() -> None:
+    result = runner.invoke(app, ["skill", "path"])
+    assert result.exit_code == 0
+    assert '"success": true' in result.output
+    assert '"skill": "emq-cli"' in result.output
+    assert "skills/emq-cli" in result.output
 
 
 def test_market_series_table_output(monkeypatch) -> None:

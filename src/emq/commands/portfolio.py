@@ -19,7 +19,7 @@ def create(
     ctx: typer.Context,
     code: str = typer.Option(..., "--code", help="Portfolio code."),
     name: str = typer.Option(..., "--name", help="Portfolio name."),
-    initial_fund: float = typer.Option(..., "--initial-fund", help="Initial fund."),
+    initial_fund: int = typer.Option(..., "--initial-fund", help="Initial fund (integer only)."),
     remark: str = typer.Option("", "--remark", help="Remark."),
     options: str = typer.Option("", "--options", help="Raw EmQuant options string."),
     output: str | None = typer.Option(
@@ -95,7 +95,7 @@ def _load_orders(path: Path) -> dict:
 
 
 def _create(
-    code: str, name: str, initial_fund: float, remark: str, options: str, no_auto_login: bool
+    code: str, name: str, initial_fund: int, remark: str, options: str, no_auto_login: bool
 ) -> Any:
     ensure_login(no_auto_login=no_auto_login)
     c = get_emquant_client()

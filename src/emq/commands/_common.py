@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from ctypes import ArgumentError
 from typing import Any
 
 import typer
@@ -101,6 +102,17 @@ def execute_sdk_command(
                 code="EMQUANT_NATIVE_LOAD_ERROR",
                 source="emquant",
                 exit_code=3,
+            ),
+        )
+    except (ArgumentError, TypeError, ValueError) as exc:
+        emit_error(
+            ctx,
+            command=command,
+            error=EmqCliError(
+                f"Invalid arguments for EmQuant command: {exc}",
+                code="EMQUANT_ARGUMENT_ERROR",
+                source="emquant",
+                exit_code=2,
             ),
         )
     except EmqCliError as exc:

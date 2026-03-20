@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from ctypes import ArgumentError
 from pathlib import Path
 
 from typer.testing import CliRunner
@@ -32,6 +33,10 @@ class FakeEmqData:
 class FakeClient:
     def __init__(self) -> None:
         self.calls: list[tuple] = []
+
+    def pcreate(self, code: str, name: str, initial_fund: int, remark: str, options: str):
+        self.calls.append(("pcreate", code, name, initial_fund, remark, options))
+        return FakeEmqData(data={"result": "ok"}, codes=[code], indicators=["RESULT"], dates=[])
 
     def css(self, codes: str, indicators: str, options: str):
         self.calls.append(("css", codes, indicators, options))
@@ -267,6 +272,50 @@ def test_portfolio_order_uses_json_file(monkeypatch, tmp_path: Path) -> None:
     assert client.calls[-1][1] == "P1"
 
 
+def test_portfolio_create_accepts_integer_initial_fund(monkeypatch) -> None:
+    from emq.commands import portfolio
+
+    client = FakeClient()
+    monkeypatch.setattr(portfolio, "ensure_login", lambda no_auto_login=False: {"ok": True})
+    monkeypatch.setattr(portfolio, "get_emquant_client", lambda: client)
+
+    result = runner.invoke(
+        app,
+        [
+            "portfolio",
+            "create",
+            "--code",
+            "P1",
+            "--name",
+            "Portfolio-1",
+            "--initial-fund",
+            "1000000",
+        ],
+    )
+    assert result.exit_code == 0
+    assert client.calls[-1][0] == "pcreate"
+    assert client.calls[-1][3] == 1000000
+    assert isinstance(client.calls[-1][3], int)
+
+
+def test_portfolio_create_rejects_decimal_initial_fund() -> None:
+    result = runner.invoke(
+        app,
+        [
+            "portfolio",
+            "create",
+            "--code",
+            "P1",
+            "--name",
+            "Portfolio-1",
+            "--initial-fund",
+            "1000000.5",
+        ],
+    )
+    assert result.exit_code == 2
+    assert "--initial-fund" in result.output
+
+
 def test_portfolio_order_invalid_json(monkeypatch, tmp_path: Path) -> None:
     from emq.commands import portfolio
 
@@ -408,3 +457,32 @@ def test_sdk_error_mapped_to_nonzero_exit(monkeypatch) -> None:
     result = runner.invoke(app, ["raw", "pquery"])
     assert result.exit_code == 3
     assert "bad request" in result.output
+
+
+def test_sdk_argument_error_mapped_to_structured_error(monkeypatch) -> None:
+    from emq.commands import portfolio
+
+    class ArgumentErrorClient(FakeClient):
+        def pcreate(self, code: str, name: str, initial_fund: int, remark: str, options: str):
+            raise ArgumentError("argument 3: TypeError: integer expected")
+
+    monkeypatch.setattr(portfolio, "ensure_login", lambda no_auto_login=False: {"ok": True})
+    monkeypatch.setattr(portfolio, "get_emquant_client", lambda: ArgumentErrorClient())
+
+    result = runner.invoke(
+        app,
+        [
+            "portfolio",
+            "create",
+            "--code",
+            "P1",
+            "--name",
+            "Portfolio-1",
+            "--initial-fund",
+            "1000000",
+        ],
+    )
+    assert result.exit_code == 2
+    assert '"code": "EMQUANT_ARGUMENT_ERROR"' in result.output
+    assert "Invalid arguments for EmQuant command" in result.output
+    assert "Traceback" not in result.output

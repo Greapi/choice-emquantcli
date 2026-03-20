@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -20,7 +20,7 @@ class AuthState:
             "user": self.user,
             "password": self.password,
             "force_login": self.force_login,
-            "updated_at": datetime.now(tz=UTC).isoformat(),
+            "updated_at": datetime.now(tz=timezone.utc).isoformat(),
         }
 
     @classmethod

@@ -4,12 +4,19 @@ build-backend = "hatchling.build"
 
 [project]
 name = "emq-cli"
-version = "0.2.2"
+version = "0.2.3"
 description = "EMQ CLI with vendored EmQuantAPI integration."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "emq-cli contributors" }]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
 dependencies = [
   "typer>=0.16.0,<1.0.0",
 ]
@@ -27,14 +34,14 @@ dev = [
 
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py310"
 extend-exclude = ["EMQuantAPI_Python", "src/emq/vendor"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.10"
 mypy_path = ["src"]
 warn_return_any = true
 warn_unused_configs = true

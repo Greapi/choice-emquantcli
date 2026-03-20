@@ -3,7 +3,7 @@ from __future__ import annotations
 import csv
 import json
 import sys
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from io import StringIO
 from typing import Any
 
@@ -22,7 +22,7 @@ def build_envelope(
 ) -> ResultEnvelope:
     merged_meta = {
         "command": command,
-        "timestamp": datetime.now(tz=UTC).isoformat(),
+        "timestamp": datetime.now(tz=timezone.utc).isoformat(),
         "output": output,
         "row_count": len(data),
     }

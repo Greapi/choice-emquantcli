@@ -8,6 +8,7 @@ import typer
 from emq.core.errors import EmqCliError
 from emq.core.normalize import normalize_emquant_data
 from emq.core.output import build_envelope, emit
+from emq.core.platform_support import ensure_sdk_runtime_supported
 from emq.types import ErrorInfo
 
 
@@ -66,6 +67,7 @@ def execute_sdk_command(
     fn: Callable[[], Any],
 ) -> None:
     try:
+        ensure_sdk_runtime_supported()
         result = fn()
         if hasattr(result, "ErrorCode") and int(result.ErrorCode) != 0:
             raise EmqCliError(
@@ -90,5 +92,16 @@ def execute_sdk_command(
             )
         else:
             emit_success(ctx, command=command, rows=[{"value": result}], meta={"row_count": 1})
+    except (OSError, ImportError) as exc:
+        emit_error(
+            ctx,
+            command=command,
+            error=EmqCliError(
+                f"Failed to load EmQuant native runtime: {exc}",
+                code="EMQUANT_NATIVE_LOAD_ERROR",
+                source="emquant",
+                exit_code=3,
+            ),
+        )
     except EmqCliError as exc:
         emit_error(ctx, command=command, error=exc)

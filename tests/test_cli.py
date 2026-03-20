@@ -5,6 +5,7 @@ from pathlib import Path
 from typer.testing import CliRunner
 
 from emq.cli import app
+from emq.core.errors import EmqCliError
 
 runner = CliRunner()
 
@@ -316,6 +317,37 @@ def test_portfolio_qorder_builds_order_dict(monkeypatch) -> None:
     assert order_dict["volume"] == [1000.0]
     assert order_dict["price"] == [10.5]
     assert order_dict["date"] == ["20250115"]  # Normalized format
+
+
+def test_auth_status_reports_unsupported_architecture(monkeypatch) -> None:
+    from emq.commands import _common
+
+    monkeypatch.setattr(
+        _common,
+        "ensure_sdk_runtime_supported",
+        lambda: (_ for _ in ()).throw(
+            EmqCliError("unsupported arch", code="EMQUANT_ARCH_UNSUPPORTED", exit_code=2)
+        ),
+    )
+
+    result = runner.invoke(app, ["auth", "status"])
+    assert result.exit_code == 2
+    assert '"code": "EMQUANT_ARCH_UNSUPPORTED"' in result.output
+    assert '"source": "cli"' in result.output
+
+
+def test_auth_status_wraps_oserror_from_sdk_load(monkeypatch) -> None:
+    from emq.commands import auth
+
+    monkeypatch.setattr(
+        auth,
+        "status",
+        lambda check=False, no_auto_login=False: (_ for _ in ()).throw(OSError("boom")),
+    )
+    result = runner.invoke(app, ["auth", "status"])
+    assert result.exit_code == 3
+    assert '"code": "EMQUANT_NATIVE_LOAD_ERROR"' in result.output
+    assert '"source": "emquant"' in result.output
 
 
 def test_portfolio_qorder_with_optional_params(monkeypatch) -> None:

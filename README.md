@@ -6,6 +6,14 @@
 
 - Python 3.10+
 
+## Platform Support
+
+- macOS: `x86_64`, `arm64` (universal wheel)
+- Linux: `x86_64` only
+- Windows: `amd64` only
+
+Linux `arm64/aarch64` is not supported by the vendored EmQuant Linux SDK at this time.
+
 ## Quick Start
 
 ```bash

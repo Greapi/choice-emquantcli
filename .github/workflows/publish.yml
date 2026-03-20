@@ -10,9 +10,13 @@ jobs:
     uses: ./.github/workflows/ci.yml
 
   build:
-    name: Build distribution packages
+    name: Build wheel (${{ matrix.os }})
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,14 +26,34 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Build package
-        run: uv build
+      - name: Build wheel
+        run: uv build --wheel
+        shell: bash
 
-      - name: Upload distributions
+      - name: Retag wheel for target platform
+        run: |
+          set -eux
+          if [ "${{ runner.os }}" = "Linux" ]; then
+            python -m wheel tags --platform-tag linux_x86_64 --remove dist/*.whl
+          elif [ "${{ runner.os }}" = "macOS" ]; then
+            python -m wheel tags --platform-tag macosx_11_0_universal2 --remove dist/*.whl
+          elif [ "${{ runner.os }}" = "Windows" ]; then
+            python -m wheel tags --platform-tag win_amd64 --remove dist/*.whl
+          else
+            echo "Unsupported runner OS: ${{ runner.os }}"
+            exit 1
+          fi
+        shell: bash
+
+      - name: Keep wheel artifacts only
+        run: rm -f dist/*.tar.gz
+        shell: bash
+
+      - name: Upload wheel artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dist
-          path: dist/
+          name: dist-${{ runner.os }}
+          path: dist/*.whl
 
   publish:
     name: Publish to PyPI
@@ -44,8 +68,9 @@ jobs:
       - name: Download distributions
         uses: actions/download-artifact@v4
         with:
-          name: dist
           path: dist/
+          pattern: dist-*
+          merge-multiple: true
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

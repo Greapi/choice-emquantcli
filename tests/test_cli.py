@@ -452,8 +452,11 @@ def test_portfolio_delete_success(monkeypatch) -> None:
     from emq.commands import portfolio
 
     client = FakeClient()
-    monkeypatch.setattr(portfolio, "ensure_login", lambda no_auto_login=False: {"ok": True})
-    monkeypatch.setattr(portfolio, "get_emquant_client", lambda: client)
+    monkeypatch.setattr(
+        portfolio,
+        "run_delete_with_network_retry",
+        lambda no_auto_login, action: action(client),
+    )
 
     result = runner.invoke(app, ["portfolio", "delete", "--code", "P1", "--yes"])
     assert result.exit_code == 0
@@ -464,8 +467,11 @@ def test_raw_pdelete_success(monkeypatch) -> None:
     from emq.commands import raw
 
     client = FakeClient()
-    monkeypatch.setattr(raw, "ensure_login", lambda no_auto_login=False: {"ok": True})
-    monkeypatch.setattr(raw, "get_emquant_client", lambda: client)
+    monkeypatch.setattr(
+        raw,
+        "run_delete_with_network_retry",
+        lambda no_auto_login, action: action(client),
+    )
 
     result = runner.invoke(app, ["raw", "pdelete", "--code", "P1", "--yes"])
     assert result.exit_code == 0
@@ -498,8 +504,11 @@ def test_portfolio_delete_trailing_output_table(monkeypatch) -> None:
     from emq.commands import portfolio
 
     client = FakeClient()
-    monkeypatch.setattr(portfolio, "ensure_login", lambda no_auto_login=False: {"ok": True})
-    monkeypatch.setattr(portfolio, "get_emquant_client", lambda: client)
+    monkeypatch.setattr(
+        portfolio,
+        "run_delete_with_network_retry",
+        lambda no_auto_login, action: action(client),
+    )
 
     result = runner.invoke(
         app,

@@ -9,7 +9,7 @@ import typer
 from emq.commands._common import apply_output_override, execute_sdk_command, get_no_auto_login
 from emq.core.emquant_loader import get_emquant_client
 from emq.core.errors import EmqCliError
-from emq.core.session import ensure_login
+from emq.core.session import ensure_login, run_delete_with_network_retry
 
 app = typer.Typer(help="Raw EmQuant command passthrough.")
 
@@ -164,6 +164,7 @@ def _pdelete(code: str, yes: bool, options: str, no_auto_login: bool) -> Any:
             code="CONFIRMATION_REQUIRED",
             exit_code=2,
         )
-    ensure_login(no_auto_login=no_auto_login)
-    c = get_emquant_client()
-    return c.pdelete(code, options)
+    return run_delete_with_network_retry(
+        no_auto_login=no_auto_login,
+        action=lambda c: c.pdelete(code, options),
+    )

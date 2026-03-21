@@ -18,6 +18,7 @@ This document guides AI coding agents working in this repository. Focus on pract
 - Preserve existing coding style and project patterns.
 - Add or adjust tests when behavior changes.
 - Keep user-facing behavior and output contracts consistent unless asked to change them.
+- When CLI capabilities or command usage change, update `src/emq/skills/emq-cli/SKILL.md` (and related command recipes) in the same change to keep skill guidance in sync.
 
 ### Don't
 - Do not edit vendored SDK files unless explicitly requested.

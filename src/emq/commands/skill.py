@@ -24,6 +24,7 @@ def path_cmd(
 def get_skill_path_info() -> dict[str, str]:
     root = files("emq.skills")
     skill_dir = root.joinpath("emq-cli")
+    skill_file = skill_dir.joinpath("SKILL.md")
 
     if not skill_dir.is_dir():
         raise EmqCliError(
@@ -32,4 +33,11 @@ def get_skill_path_info() -> dict[str, str]:
             exit_code=2,
         )
 
-    return {"skill": "emq-cli", "path": str(skill_dir)}
+    if not skill_file.is_file():
+        raise EmqCliError(
+            "packaged skill file 'emq-cli/SKILL.md' not found",
+            code="SKILL_NOT_FOUND",
+            exit_code=2,
+        )
+
+    return {"skill": "emq-cli", "path": str(skill_dir), "skill_file": str(skill_file)}

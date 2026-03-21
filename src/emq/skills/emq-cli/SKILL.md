@@ -32,7 +32,7 @@ emq auth status
 
 1) 先确认认证状态（`auth status`）。
 2) 数据查询优先使用 `market snapshot` / `market series`。
-3) 组合操作优先使用 `portfolio create` / `portfolio list` / `portfolio qorder` / `portfolio delete`。
+3) 组合操作优先使用 `portfolio create` / `portfolio list` / `portfolio hold` / `portfolio qorder` / `portfolio delete`。
 4) 额度检查使用 `quota usage`。
 5) 需要直接透传 SDK 参数时使用 `raw css/csd/pquery/porder/pdelete`。
 
@@ -43,6 +43,7 @@ emq market snapshot 000001.SZ CLOSE --output table
 emq market series 000001.SZ CLOSE --start 2025-01-01 --end 2025-01-31 --output csv
 emq portfolio create --code DEMO_PF --name "Demo Portfolio" --initial-fund 1000000
 emq portfolio list --output table
+emq portfolio hold --code DEMO_PF --output table
 emq portfolio qorder --code DEMO_PF --stock 300059.SZ --volume 1000 --price 10.5 --date 2025-01-15
 emq portfolio delete --code DEMO_PF --yes
 emq quota usage --start 2025-01-01 --end 2025-01-31

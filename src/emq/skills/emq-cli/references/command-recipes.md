@@ -22,6 +22,9 @@ emq portfolio create --code DEMO_PF --name "Demo Portfolio" --initial-fund 10000
 # 查看组合
 emq portfolio list --output table
 
+# 查看组合持仓
+emq portfolio hold --code DEMO_PF --output table
+
 # 快速单笔下单
 emq portfolio qorder --code DEMO_PF --stock 300059.SZ --volume 1000 --price 10.5 --date 2025-01-15 --time 14:30:00 --type 1
 

@@ -110,6 +110,8 @@ def test_skill_path_returns_packaged_skill_path() -> None:
     assert '"success": true' in result.output
     assert '"skill": "emq-cli"' in result.output
     assert "skills/emq-cli" in result.output
+    assert '"skill_file"' in result.output
+    assert "skills/emq-cli/SKILL.md" in result.output
 
 
 def test_market_series_table_output(monkeypatch) -> None:

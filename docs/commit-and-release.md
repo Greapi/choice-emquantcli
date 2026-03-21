@@ -56,11 +56,12 @@ type!: 描述
 
 - 标签必须为 `vX.Y.Z`（例如 `v0.2.4`）。
 - `pyproject.toml` 中 `[project].version` 必须与标签一致（去掉 `v` 前缀后相同）。
+- 若版本变更导致 `uv.lock` 中 `emq-cli` 版本同步变化，该 `uv.lock` 改动必须与发布提交一并提交。
 - 新标签版本必须严格大于历史最大发布标签版本（只增不减，不可复用）。
 
 ## 3. 发布流程
 
-1. 修改 `pyproject.toml` 的 `[project].version` 为目标版本（如 `0.2.4`）。
+1. 修改 `pyproject.toml` 的 `[project].version` 为目标版本（如 `0.2.4`），并确认 `uv.lock` 的项目版本同步变化已纳入本次提交。
 2. 提交代码（Commit Message 需符合 Conventional Commits 规范，推荐中文描述）。
 3. 创建标签：`git tag v0.2.4`。
 4. 推送分支与标签：`git push && git push --tags`。

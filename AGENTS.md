@@ -46,6 +46,7 @@ uv run pytest
 - Commit descriptions must include Chinese characters.
 - Release tags must follow `vX.Y.Z`.
 - The tag version must match `[project].version` in `pyproject.toml` (without the `v` prefix).
+- If version bump changes `uv.lock` (`emq-cli` package version entry), include that `uv.lock` update in the same release commit.
 
 Reference: `docs/commit-and-release.md`
 

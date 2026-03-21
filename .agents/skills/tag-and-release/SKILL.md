@@ -23,7 +23,7 @@ description: 指导在 emq-cli 仓库中执行版本发布：更新 pyproject.to
 git status --porcelain
 ```
 
-1. 更新版本号：修改 `pyproject.toml` 的 `[project].version` 为目标版本（例如 `0.2.8`），并同步更新所有与版本相关的文件。
+1. 更新版本号：修改 `pyproject.toml` 的 `[project].version` 为目标版本（例如 `0.2.8`），并同步更新所有与版本相关的文件（若 `uv.lock` 中 `emq-cli` 版本随之变化，必须一并提交）。
 2. 运行发布前校验：
 
 ```bash
@@ -36,7 +36,7 @@ uv run pytest
 3. 提交变更：使用 Conventional Commits，描述优先中文。
 
 ```bash
-git add pyproject.toml [其他发布相关文件]
+git add pyproject.toml uv.lock [其他发布相关文件]
 git commit -m "chore(release): 发布 v0.2.8"
 ```
 
@@ -86,8 +86,9 @@ git diff --name-only v0.2.7..HEAD
 
 1. 标签必须使用 `vX.Y.Z` 格式。
 2. 标签版本去掉 `v` 前缀后，必须与 `[project].version` 完全一致。
-3. 版本号必须递增，禁止复用历史标签版本。
-4. 提交信息必须符合 Conventional Commits。
+3. 若版本变更触发 `uv.lock` 中 `emq-cli` 版本变化，发布提交必须包含该 `uv.lock` 变更。
+4. 版本号必须递增，禁止复用历史标签版本。
+5. 提交信息必须符合 Conventional Commits。
 
 ## 失败排查
 

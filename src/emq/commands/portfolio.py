@@ -108,6 +108,29 @@ def _list(options: str, no_auto_login: bool) -> Any:
     return c.pquery(options)
 
 
+@app.command("hold")
+def hold(
+    ctx: typer.Context,
+    code: str = typer.Option(..., "--code", help="Portfolio code."),
+    options: str = typer.Option("", "--options", help="Raw EmQuant options string."),
+    output: str | None = typer.Option(
+        None, "--output", help="Output format override: json|table|csv."
+    ),
+) -> None:
+    apply_output_override(ctx, output)
+    execute_sdk_command(
+        ctx,
+        command="portfolio.hold",
+        fn=lambda: _hold(code, options, get_no_auto_login(ctx)),
+    )
+
+
+def _hold(code: str, options: str, no_auto_login: bool) -> Any:
+    ensure_login(no_auto_login=no_auto_login)
+    c = get_emquant_client()
+    return c.preport(code, "hold", options)
+
+
 @app.command("delete")
 def delete(
     ctx: typer.Context,

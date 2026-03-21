@@ -273,6 +273,30 @@ emq portfolio list [选项]
 emq portfolio list --output table
 ```
 
+### portfolio hold
+
+查询指定组合的持仓明细（对应 SDK 的 `preport` 方法，`indicator=hold`）。
+
+**用法：**
+
+```bash
+emq portfolio hold --code <code> [选项]
+```
+
+**参数：**
+
+| 选项 | 必填 | 说明 |
+|------|------|------|
+| `--code` | 是 | 组合代码 |
+| `--options` | 否 | 原始 EmQuant 选项字符串 |
+| `--output` | 否 | 输出格式覆盖 |
+
+**示例：**
+
+```bash
+emq portfolio hold --code my_portfolio --output table
+```
+
 ### portfolio delete
 
 删除指定投资组合（对应 SDK 的 `pdelete` 方法）。

@@ -65,6 +65,15 @@ class FakeClient:
             dates=[],
         )
 
+    def preport(self, code: str, indicator: str, options: str):
+        self.calls.append(("preport", code, indicator, options))
+        return FakeEmqData(
+            data={code: ["000001.SZ", 1000.0]},
+            codes=[code],
+            indicators=["STOCKCODE", "VOLUME"],
+            dates=[],
+        )
+
     def porder(self, code: str, orders: dict, remark: str, options: str):
         self.calls.append(("porder", code, orders, remark, options))
         return FakeEmqData(data={"result": "ok"}, codes=[code], indicators=["RESULT"], dates=[])
@@ -274,6 +283,49 @@ def test_portfolio_order_uses_json_file(monkeypatch, tmp_path: Path) -> None:
     assert result.exit_code == 0
     assert client.calls[-1][0] == "porder"
     assert client.calls[-1][1] == "P1"
+
+
+def test_portfolio_hold_calls_preport_with_hold_indicator(monkeypatch) -> None:
+    from emq.commands import portfolio
+
+    client = FakeClient()
+    monkeypatch.setattr(portfolio, "ensure_login", lambda no_auto_login=False: {"ok": True})
+    monkeypatch.setattr(portfolio, "get_emquant_client", lambda: client)
+
+    result = runner.invoke(app, ["portfolio", "hold", "--code", "P1"])
+    assert result.exit_code == 0
+    assert client.calls[-1] == ("preport", "P1", "hold", "")
+
+
+def test_portfolio_hold_options_passthrough(monkeypatch) -> None:
+    from emq.commands import portfolio
+
+    client = FakeClient()
+    monkeypatch.setattr(portfolio, "ensure_login", lambda no_auto_login=False: {"ok": True})
+    monkeypatch.setattr(portfolio, "get_emquant_client", lambda: client)
+
+    options = "StartDate=20250101,EndDate=20250131"
+    result = runner.invoke(
+        app,
+        ["portfolio", "hold", "--code", "P1", "--options", options],
+    )
+    assert result.exit_code == 0
+    assert client.calls[-1] == ("preport", "P1", "hold", options)
+
+
+def test_portfolio_hold_trailing_output_csv(monkeypatch) -> None:
+    from emq.commands import portfolio
+
+    client = FakeClient()
+    monkeypatch.setattr(portfolio, "ensure_login", lambda no_auto_login=False: {"ok": True})
+    monkeypatch.setattr(portfolio, "get_emquant_client", lambda: client)
+
+    result = runner.invoke(
+        app,
+        ["portfolio", "hold", "--code", "P1", "--output", "csv"],
+    )
+    assert result.exit_code == 0
+    assert "code,indicator,date,value" in result.output
 
 
 def test_portfolio_create_accepts_integer_initial_fund(monkeypatch) -> None:

@@ -45,7 +45,7 @@ emq portfolio qorder --code MYPORT --stock 300059.SZ --volume 1000 --price 10.5 
 
 - `auth`: `login`, `logout`, `status`
 - `market`: `snapshot`, `series`
-- `portfolio`: `create`, `list`, `order`, `qorder`
+- `portfolio`: `create`, `list`, `hold`, `order`, `qorder`
 - `quota`: `usage`
 - `raw`: `css`, `csd`, `pquery`, `porder`
 

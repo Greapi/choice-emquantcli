@@ -26,3 +26,5 @@ coverage.xml
 
 # EmQuant API local login artifact
 src/emq/vendor/emquantapi/python3/libs/mac/logininfo.log
+src/emq/vendor/emquantapi/python3/libs/mac/ServerList.json.e
+src/emq/vendor/emquantapi/python3/libs/mac/config.e

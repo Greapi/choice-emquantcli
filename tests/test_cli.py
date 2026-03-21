@@ -69,6 +69,10 @@ class FakeClient:
         self.calls.append(("porder", code, orders, remark, options))
         return FakeEmqData(data={"result": "ok"}, codes=[code], indicators=["RESULT"], dates=[])
 
+    def pdelete(self, code: str, options: str):
+        self.calls.append(("pdelete", code, options))
+        return FakeEmqData(data={"result": "ok"}, codes=[code], indicators=["RESULT"], dates=[])
+
     def datastatistics(self, func: str, indicators: str, options: str):
         self.calls.append(("datastatistics", func, indicators, options))
         return FakeEmqData(
@@ -442,6 +446,68 @@ def test_portfolio_qorder_missing_required_params() -> None:
     result = runner.invoke(app, ["portfolio", "qorder", "--code", "P1"])
     assert result.exit_code != 0
     assert "--stock" in result.output or "Missing option" in result.output
+
+
+def test_portfolio_delete_success(monkeypatch) -> None:
+    from emq.commands import portfolio
+
+    client = FakeClient()
+    monkeypatch.setattr(portfolio, "ensure_login", lambda no_auto_login=False: {"ok": True})
+    monkeypatch.setattr(portfolio, "get_emquant_client", lambda: client)
+
+    result = runner.invoke(app, ["portfolio", "delete", "--code", "P1", "--yes"])
+    assert result.exit_code == 0
+    assert client.calls[-1] == ("pdelete", "P1", "")
+
+
+def test_raw_pdelete_success(monkeypatch) -> None:
+    from emq.commands import raw
+
+    client = FakeClient()
+    monkeypatch.setattr(raw, "ensure_login", lambda no_auto_login=False: {"ok": True})
+    monkeypatch.setattr(raw, "get_emquant_client", lambda: client)
+
+    result = runner.invoke(app, ["raw", "pdelete", "--code", "P1", "--yes"])
+    assert result.exit_code == 0
+    assert client.calls[-1] == ("pdelete", "P1", "")
+
+
+def test_portfolio_delete_requires_yes(monkeypatch) -> None:
+    from emq.commands import portfolio
+
+    monkeypatch.setattr(portfolio, "ensure_login", lambda no_auto_login=False: {"ok": True})
+    monkeypatch.setattr(portfolio, "get_emquant_client", lambda: FakeClient())
+
+    result = runner.invoke(app, ["portfolio", "delete", "--code", "P1"])
+    assert result.exit_code == 2
+    assert '"code": "CONFIRMATION_REQUIRED"' in result.output
+
+
+def test_raw_pdelete_requires_yes(monkeypatch) -> None:
+    from emq.commands import raw
+
+    monkeypatch.setattr(raw, "ensure_login", lambda no_auto_login=False: {"ok": True})
+    monkeypatch.setattr(raw, "get_emquant_client", lambda: FakeClient())
+
+    result = runner.invoke(app, ["raw", "pdelete", "--code", "P1"])
+    assert result.exit_code == 2
+    assert '"code": "CONFIRMATION_REQUIRED"' in result.output
+
+
+def test_portfolio_delete_trailing_output_table(monkeypatch) -> None:
+    from emq.commands import portfolio
+
+    client = FakeClient()
+    monkeypatch.setattr(portfolio, "ensure_login", lambda no_auto_login=False: {"ok": True})
+    monkeypatch.setattr(portfolio, "get_emquant_client", lambda: client)
+
+    result = runner.invoke(
+        app,
+        ["portfolio", "delete", "--code", "P1", "--yes", "--output", "table"],
+    )
+    assert result.exit_code == 0
+    assert "|" in result.output
+    assert '"success"' not in result.output
 
 
 def test_sdk_error_mapped_to_nonzero_exit(monkeypatch) -> None:

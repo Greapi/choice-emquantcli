@@ -93,6 +93,24 @@ def porder(
     )
 
 
+@app.command("pdelete")
+def pdelete(
+    ctx: typer.Context,
+    code: str = typer.Option(..., "--code"),
+    yes: bool = typer.Option(False, "--yes", help="Confirm deletion."),
+    options: str = typer.Option("", "--options"),
+    output: str | None = typer.Option(
+        None, "--output", help="Output format override: json|table|csv."
+    ),
+) -> None:
+    apply_output_override(ctx, output)
+    execute_sdk_command(
+        ctx,
+        command="raw.pdelete",
+        fn=lambda: _pdelete(code, yes, options, get_no_auto_login(ctx)),
+    )
+
+
 def _load_orders(path: Path) -> dict:
     try:
         with path.open("r", encoding="utf-8") as f:
@@ -137,3 +155,15 @@ def _porder(code: str, orders_file: Path, remark: str, options: str, no_auto_log
     c = get_emquant_client()
     orders = _load_orders(orders_file)
     return c.porder(code, orders, remark, options)
+
+
+def _pdelete(code: str, yes: bool, options: str, no_auto_login: bool) -> Any:
+    if not yes:
+        raise EmqCliError(
+            "Deletion requires explicit confirmation. Pass --yes to continue.",
+            code="CONFIRMATION_REQUIRED",
+            exit_code=2,
+        )
+    ensure_login(no_auto_login=no_auto_login)
+    c = get_emquant_client()
+    return c.pdelete(code, options)

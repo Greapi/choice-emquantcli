@@ -273,6 +273,33 @@ emq portfolio list [选项]
 emq portfolio list --output table
 ```
 
+### portfolio delete
+
+删除指定投资组合（对应 SDK 的 `pdelete` 方法）。
+
+为避免误删，必须显式传入 `--yes` 才会执行删除。
+
+**用法：**
+
+```bash
+emq portfolio delete --code <code> --yes [选项]
+```
+
+**参数：**
+
+| 选项 | 必填 | 说明 |
+|------|------|------|
+| `--code` | 是 | 组合代码 |
+| `--yes` | 是 | 删除确认开关，不提供则拒绝执行 |
+| `--options` | 否 | 原始 EmQuant 选项字符串 |
+| `--output` | 否 | 输出格式覆盖 |
+
+**示例：**
+
+```bash
+emq portfolio delete --code my_portfolio --yes
+```
+
 ### portfolio order
 
 通过文件方式对组合进行批量下单。
@@ -522,6 +549,33 @@ emq raw porder --code my_portfolio --orders-file ./order.json
 
 # 调仓至目标权重模式
 emq raw porder --code my_portfolio --orders-file ./order.json --options "OrderMode=2"
+```
+
+### raw pdelete
+
+原始组合删除（对应 SDK 的 `pdelete` 方法）。
+
+为避免误删，必须显式传入 `--yes` 才会执行删除。
+
+**用法：**
+
+```bash
+emq raw pdelete --code <code> --yes [选项]
+```
+
+**参数：**
+
+| 选项 | 必填 | 说明 |
+|------|------|------|
+| `--code` | 是 | 组合代码 |
+| `--yes` | 是 | 删除确认开关，不提供则拒绝执行 |
+| `--options` | 否 | 原始 EmQuant 选项字符串 |
+| `--output` | 否 | 输出格式覆盖 |
+
+**示例：**
+
+```bash
+emq raw pdelete --code my_portfolio --yes
 ```
 
 ---

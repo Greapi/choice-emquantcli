@@ -1,6 +1,6 @@
 ---
 name: emq-cli
-description: 使用 emq-cli 命令行进行安装与环境准备、认证登录、行情查询（market）、组合创建与下单（portfolio）、额度查询（quota）、以及 raw 透传命令调用与常见排障。遇到“如何安装 emq”“如何登录”“如何查快照/序列”“如何创建组合/下单”“参数报错如何修复”等场景时使用本技能。
+description: 使用 emq-cli 命令行进行安装与环境准备、认证登录、行情查询（market）、组合创建/删除与下单（portfolio）、额度查询（quota）、以及 raw 透传命令调用与常见排障。遇到“如何安装 emq”“如何登录”“如何查快照/序列”“如何创建组合/删除组合/下单”“参数报错如何修复”等场景时使用本技能。
 ---
 
 # EMQ CLI
@@ -32,9 +32,9 @@ emq auth status
 
 1) 先确认认证状态（`auth status`）。
 2) 数据查询优先使用 `market snapshot` / `market series`。
-3) 组合操作优先使用 `portfolio create` / `portfolio list` / `portfolio qorder`。
+3) 组合操作优先使用 `portfolio create` / `portfolio list` / `portfolio qorder` / `portfolio delete`。
 4) 额度检查使用 `quota usage`。
-5) 需要直接透传 SDK 参数时使用 `raw css/csd/pquery/porder`。
+5) 需要直接透传 SDK 参数时使用 `raw css/csd/pquery/porder/pdelete`。
 
 ## 常用命令模板
 
@@ -44,8 +44,10 @@ emq market series 000001.SZ CLOSE --start 2025-01-01 --end 2025-01-31 --output c
 emq portfolio create --code DEMO_PF --name "Demo Portfolio" --initial-fund 1000000
 emq portfolio list --output table
 emq portfolio qorder --code DEMO_PF --stock 300059.SZ --volume 1000 --price 10.5 --date 2025-01-15
+emq portfolio delete --code DEMO_PF --yes
 emq quota usage --start 2025-01-01 --end 2025-01-31
 emq raw css 000001.SZ CLOSE --options "TradeDate=2025-01-15"
+emq raw pdelete --code DEMO_PF --yes
 ```
 
 ## 输出与参数规则
@@ -53,6 +55,7 @@ emq raw css 000001.SZ CLOSE --options "TradeDate=2025-01-15"
 1) 默认输出为 `json`；可用 `--output json|table|csv`。
 2) 叶子命令末尾的 `--output` 会覆盖全局 `--output`。
 3) 日期参数统一使用 `YYYY-MM-DD`。
+4) 删除组合命令必须显式传入 `--yes`。
 
 ## 排障约定
 

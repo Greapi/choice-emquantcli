@@ -108,6 +108,36 @@ def _list(options: str, no_auto_login: bool) -> Any:
     return c.pquery(options)
 
 
+@app.command("delete")
+def delete(
+    ctx: typer.Context,
+    code: str = typer.Option(..., "--code", help="Portfolio code."),
+    yes: bool = typer.Option(False, "--yes", help="Confirm deletion."),
+    options: str = typer.Option("", "--options", help="Raw EmQuant options string."),
+    output: str | None = typer.Option(
+        None, "--output", help="Output format override: json|table|csv."
+    ),
+) -> None:
+    apply_output_override(ctx, output)
+    execute_sdk_command(
+        ctx,
+        command="portfolio.delete",
+        fn=lambda: _delete(code, yes, options, get_no_auto_login(ctx)),
+    )
+
+
+def _delete(code: str, yes: bool, options: str, no_auto_login: bool) -> Any:
+    if not yes:
+        raise EmqCliError(
+            "Deletion requires explicit confirmation. Pass --yes to continue.",
+            code="CONFIRMATION_REQUIRED",
+            exit_code=2,
+        )
+    ensure_login(no_auto_login=no_auto_login)
+    c = get_emquant_client()
+    return c.pdelete(code, options)
+
+
 @app.command("qorder")
 def qorder(
     ctx: typer.Context,

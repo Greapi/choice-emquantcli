@@ -24,6 +24,9 @@ emq portfolio list --output table
 
 # 快速单笔下单
 emq portfolio qorder --code DEMO_PF --stock 300059.SZ --volume 1000 --price 10.5 --date 2025-01-15 --time 14:30:00 --type 1
+
+# 删除组合（必须显式确认）
+emq portfolio delete --code DEMO_PF --yes
 ```
 
 ### 批量下单 JSON 示例
@@ -40,6 +43,9 @@ emq portfolio qorder --code DEMO_PF --stock 300059.SZ --volume 1000 --price 10.5
 ```bash
 emq portfolio order --code DEMO_PF --orders-file ./orders.json --remark "batch order"
 emq raw porder --code DEMO_PF --orders-file ./orders.json --remark "raw batch order"
+
+# 原始删除组合（必须显式确认）
+emq raw pdelete --code DEMO_PF --yes
 ```
 
 ## 额度查询

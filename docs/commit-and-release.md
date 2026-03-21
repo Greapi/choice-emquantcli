@@ -1,16 +1,16 @@
 # Commit 与发布标签规范
 
-本文档定义本项目的提交与发布硬性规则。CI 会阻断不符合规则的变更与发布。
+本文档定义本项目的提交与发布规则。CI 会阻断不符合强制校验项的变更与发布。
 
 ## 1. Commit 规范（强制）
 
-Commit Message 必须使用 Conventional Commits 前缀，且描述必须包含中文。
+Commit Message 必须使用 Conventional Commits 前缀。描述推荐使用中文，但 CI 不强制。
 
 格式：
 
 ```text
-type(scope)?: 中文描述
-type!: 中文描述
+type(scope)?: 描述
+type!: 描述
 ```
 
 允许的 `type`：
@@ -31,7 +31,8 @@ type!: 中文描述
 
 - `type` 必须为小写英文。
 - `scope` 可选，若存在仅允许英文小写、数字和 `._/-`。
-- 冒号后描述必须包含中文字符，可混合英文术语与数字。
+- 冒号后描述推荐包含中文字符，可混合英文术语与数字。
+- CI 当前只强制校验 Conventional Commits 结构（`type(scope)?: subject` / `type!: subject`）。
 
 示例（合规）：
 
@@ -39,9 +40,11 @@ type!: 中文描述
 - `feat: 新增 Python 3.10 兼容性校验`
 - `ci: 调整发布流程触发条件`
 
-示例（不合规）：
+示例（不推荐，但 CI 可通过）：
 
-- `Fix portfolio bug`（描述非中文）
+- `fix: Fix portfolio bug`（仅英文描述，不推荐）
+
+示例（不合规）：
 - `修复: 处理参数问题`（type 非约定英文类型）
 - `fix(portfolio)`（缺少描述）
 
@@ -58,7 +61,7 @@ type!: 中文描述
 ## 3. 发布流程
 
 1. 修改 `pyproject.toml` 的 `[project].version` 为目标版本（如 `0.2.4`）。
-2. 提交代码（Commit Message 需符合中文提交规范）。
+2. 提交代码（Commit Message 需符合 Conventional Commits 规范，推荐中文描述）。
 3. 创建标签：`git tag v0.2.4`。
 4. 推送分支与标签：`git push && git push --tags`。
 5. GitHub Actions 自动执行校验并发布到 PyPI。
@@ -68,7 +71,7 @@ type!: 中文描述
 提交校验失败：
 
 - 检查是否使用了允许的 `type`。
-- 检查是否包含冒号后的中文描述。
+- 若你期望中文规范，检查是否包含冒号后的中文描述（CI 不强制）。
 - 检查 `scope` 是否为英文小写格式。
 
 发布标签校验失败：

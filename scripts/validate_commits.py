@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate commit messages with conventional type and Chinese subject."""
+"""Validate commit messages with conventional format and optional CJK subject."""
 
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ def run_git_log(commit_range: str) -> list[tuple[str, str]]:
     return commits
 
 
-def validate_commit_subject(message: str) -> str | None:
+def validate_commit_subject(message: str, require_cjk: bool = True) -> str | None:
     match = COMMIT_PATTERN.match(message)
     if not match:
         return (
@@ -35,7 +35,7 @@ def validate_commit_subject(message: str) -> str | None:
         )
 
     subject = match.group("subject")
-    if not HAS_CJK_PATTERN.search(subject):
+    if require_cjk and not HAS_CJK_PATTERN.search(subject):
         return "描述必须包含中文字符（可混合英文术语和数字，但不能是纯英文）。"
 
     return None
@@ -48,6 +48,12 @@ def main() -> int:
         required=True,
         help="Git revision range to validate, e.g. base..head or a single sha.",
     )
+    parser.add_argument(
+        "--require-cjk",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Whether commit subject must include CJK characters. Enabled by default.",
+    )
     args = parser.parse_args()
 
     commits = run_git_log(args.range)
@@ -57,7 +63,7 @@ def main() -> int:
 
     errors = []
     for sha, subject in commits:
-        reason = validate_commit_subject(subject)
+        reason = validate_commit_subject(subject, require_cjk=args.require_cjk)
         if reason:
             errors.append((sha, subject, reason))
 

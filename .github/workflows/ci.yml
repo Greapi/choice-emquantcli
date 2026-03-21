@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Validate commit messages (Chinese subject)
+      - name: Validate commit messages (Conventional Commits)
         env:
           EVENT_NAME: ${{ github.event_name }}
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -35,7 +35,7 @@ jobs:
             RANGE="${PUSH_HEAD_SHA}"
           fi
 
-          python scripts/validate_commits.py --range "$RANGE"
+          python scripts/validate_commits.py --range "$RANGE" --no-require-cjk
 
   test:
     needs: commit_convention

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tag & Release"
+  short_description: "Guide version tags and release publishing safely"
+  default_prompt: "Use $tag-and-release to bump the version, summarize commits from latest tag to HEAD, commit the release notes, then create and push vX.Y.Z."
